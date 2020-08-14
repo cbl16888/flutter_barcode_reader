@@ -10,7 +10,7 @@ import Foundation
 class ScannerOverlay: UIView {
     private let line: UIView = UIView()
     
-    private var scanLineRect: CGRect {
+    var scanLineRect: CGRect {
         let scanRect = calculateScanRect()
         let positionY = scanRect.origin.y + (scanRect.size.height / 2)
         
@@ -54,6 +54,7 @@ class ScannerOverlay: UIView {
         // draw a horizontal line over the middle
         let lineRect = scanLineRect
         line.frame = lineRect
+        
         
         // draw the green corners
         let cornerSize: CGFloat = 30
@@ -109,8 +110,8 @@ class ScannerOverlay: UIView {
         
         let isLandscape = frameWidth > frameHeight
         let widthOnPortrait = isLandscape ? frameHeight : frameWidth
-        let scanRectWidth = widthOnPortrait * 0.8
-        let aspectRatio: CGFloat = 3.0 / 4.0
+        let scanRectWidth = widthOnPortrait * 0.6
+        let aspectRatio: CGFloat = 4.0 / 4.0
         let scanRectHeight = scanRectWidth * aspectRatio
         
         if isLandscape {

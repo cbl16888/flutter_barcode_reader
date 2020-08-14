@@ -12,6 +12,29 @@ class BarcodeScannerViewController: UIViewController {
   private var previewView: UIView?
   private var scanRect: ScannerOverlay?
   private var scanner: MTBBarcodeScanner?
+    
+    fileprivate lazy var tipLabel: UILabel = {
+        let tipLabel = UILabel()
+        tipLabel.font = UIFont.systemFont(ofSize: 14.0)
+        tipLabel.textColor = UIColor.white
+        tipLabel.textAlignment = .center
+        tipLabel.text = "请扫描设备上的二维码"
+        tipLabel.adjustsFontSizeToFitWidth = true
+        return tipLabel
+    }()
+    
+    fileprivate lazy var inputButton: UIButton = {
+        let width = 200.0
+        let height = 50.0
+        let inputButton = UIButton(frame: CGRect(x: (Double(UIScreen.main.bounds.width) - width) * 0.5, y: Double(UIScreen.main.bounds.height) - height - 40.0, width: width, height: height))
+        inputButton.setTitle("输入设备号", for: .normal)
+        inputButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0)
+        inputButton.layer.cornerRadius = 10.0
+        inputButton.layer.masksToBounds = true
+        inputButton.backgroundColor = UIColor(red: 87/255, green: 210/255, blue: 200/255, alpha: 1)
+        inputButton.addTarget(self, action: #selector(didClickInputButton), for: .touchUpInside)
+        return inputButton
+    }()
   
   var config: Configuration = Configuration.with {
     $0.strings = [
@@ -64,7 +87,10 @@ class BarcodeScannerViewController: UIViewController {
       view.addSubview(previewView)
     }
     setupScanRect(view.bounds)
-    
+    view.addSubview(tipLabel)
+    view.addSubview(inputButton)
+    let rect = scanRect!.scanLineRect
+    tipLabel.frame = CGRect(x: rect.origin.x, y: rect.origin.y + rect.size.width * 0.5 + 10, width: rect.size.width, height: 40.0)
     let restrictedBarcodeTypes = mapRestrictedBarcodeTypes()
     if restrictedBarcodeTypes.isEmpty {
       scanner = MTBBarcodeScanner(previewView: previewView)
@@ -73,14 +99,23 @@ class BarcodeScannerViewController: UIViewController {
                                   previewView: previewView
       )
     }
-    navigationItem.leftBarButtonItem = UIBarButtonItem(title: config.strings["cancel"],
-                                                        style: .plain,
-                                                        target: self,
-                                                        action: #selector(cancel)
-    )
+    
+    let bundle = Bundle(for: type(of: self))
+    let backImage = UIImage(named: "barcode.bundle/back_icon.png", in: bundle, compatibleWith: nil)
+    let backButton = UIButton(type: .custom)
+    backButton.frame = CGRect(x: 0, y: 0, width: 20.0, height: 20.0)
+    backButton.setImage(backImage, for: .normal)
+    backButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
+    navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
     updateToggleFlashButton()
   }
-  
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+    }
+    
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
@@ -171,18 +206,25 @@ class BarcodeScannerViewController: UIViewController {
   @objc private func onToggleFlash() {
     setFlashState(!isFlashOn)
   }
+    
+    @objc private func didClickInputButton() {
+        scanResult( ScanResult.with {
+          $0.type = .cancelled
+          $0.format = .unknown
+        });
+    }
   
   private func updateToggleFlashButton() {
     if !hasTorch {
       return
     }
     
-    let buttonText = isFlashOn ? config.strings["flash_off"] : config.strings["flash_on"]
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: buttonText,
-                                                        style: .plain,
-                                                        target: self,
-                                                        action: #selector(onToggleFlash)
-    )
+//    let buttonText = isFlashOn ? config.strings["flash_off"] : config.strings["flash_on"]
+//    navigationItem.rightBarButtonItem = UIBarButtonItem(title: buttonText,
+//                                                        style: .plain,
+//                                                        target: self,
+//                                                        action: #selector(onToggleFlash)
+//    )
   }
   
   private func setFlashState(_ on: Bool) {
