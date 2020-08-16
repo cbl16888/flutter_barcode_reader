@@ -30,7 +30,7 @@ class _MyAppState extends State<_MyApp> {
   static final _possibleFormats = BarcodeFormat.values.toList()
     ..removeWhere((e) => e == BarcodeFormat.unknown);
 
-  List<BarcodeFormat> selectedFormats = [..._possibleFormats];
+  List<BarcodeFormat> selectedFormats = _possibleFormats;
 
   @override
   // ignore: type_annotate_public_apis
@@ -46,29 +46,6 @@ class _MyAppState extends State<_MyApp> {
   @override
   Widget build(BuildContext context) {
     var contentList = <Widget>[
-      if (scanResult != null)
-        Card(
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                title: Text("Result Type"),
-                subtitle: Text(scanResult.type?.toString() ?? ""),
-              ),
-              ListTile(
-                title: Text("Raw Content"),
-                subtitle: Text(scanResult.rawContent ?? ""),
-              ),
-              ListTile(
-                title: Text("Format"),
-                subtitle: Text(scanResult.format?.toString() ?? ""),
-              ),
-              ListTile(
-                title: Text("Format note"),
-                subtitle: Text(scanResult.formatNote ?? ""),
-              ),
-            ],
-          ),
-        ),
       ListTile(
         title: Text("Camera selection"),
         dense: true,
@@ -81,6 +58,30 @@ class _MyAppState extends State<_MyApp> {
         groupValue: _selectedCamera,
       ),
     ];
+    if (scanResult != null) {
+      contentList.insert(0, Card(
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              title: Text("Result Type"),
+              subtitle: Text(scanResult.type?.toString() ?? ""),
+            ),
+            ListTile(
+              title: Text("Raw Content"),
+              subtitle: Text(scanResult.rawContent ?? ""),
+            ),
+            ListTile(
+              title: Text("Format"),
+              subtitle: Text(scanResult.format?.toString() ?? ""),
+            ),
+            ListTile(
+              title: Text("Format note"),
+              subtitle: Text(scanResult.formatNote ?? ""),
+            ),
+          ],
+        ),
+      ));
+    }
 
     for (var i = 0; i < _numberOfCameras; i++) {
       contentList.add(RadioListTile(
@@ -191,9 +192,11 @@ class _MyAppState extends State<_MyApp> {
               : selectedFormats.length == 0 ? false : null,
           onChanged: (checked) {
             setState(() {
-              selectedFormats = [
-                if (checked ?? false) ..._possibleFormats,
-              ];
+              if (checked ?? false) {
+                selectedFormats = _possibleFormats;
+              } else {
+                selectedFormats = [];
+              }
             });
           },
         ),

@@ -100,11 +100,19 @@ class BarcodeScannerViewController: UIViewController {
       )
     }
     
-    let bundle = Bundle(for: type(of: self))
-    let backImage = UIImage(named: "barcode.bundle/back_icon.png", in: bundle, compatibleWith: nil)
     let backButton = UIButton(type: .custom)
     backButton.frame = CGRect(x: 0, y: 0, width: 20.0, height: 20.0)
-    backButton.setImage(backImage, for: .normal)
+    if var bundleURL = Bundle.main.url(forResource: "Frameworks", withExtension: nil) {
+        bundleURL = bundleURL.appendingPathComponent("barcode_scan")
+        bundleURL = bundleURL.appendingPathExtension("framework")
+        if let bundle = Bundle(url: bundleURL) {
+            if let imagePath = bundle.path(forResource: "back_icon.png", ofType: nil) {
+                let backImage = UIImage(contentsOfFile: imagePath)
+                backButton.setImage(backImage, for: .normal)
+            }
+        }
+        
+    }
     backButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
     navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
     updateToggleFlashButton()
@@ -197,10 +205,10 @@ class BarcodeScannerViewController: UIViewController {
   }
   
   @objc private func cancel() {
-    scanResult( ScanResult.with {
-      $0.type = .cancelled
+    self.scanResult(ScanResult.with {
+      $0.type = .error
       $0.format = .unknown
-    });
+    })
   }
   
   @objc private func onToggleFlash() {
