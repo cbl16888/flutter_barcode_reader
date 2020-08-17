@@ -19,6 +19,7 @@ class BarcodeScannerViewController: UIViewController {
         tipLabel.textColor = UIColor.white
         tipLabel.textAlignment = .center
         tipLabel.text = "请扫描设备上的二维码"
+        tipLabel.numberOfLines = 0
         tipLabel.adjustsFontSizeToFitWidth = true
         return tipLabel
     }()
@@ -34,6 +35,20 @@ class BarcodeScannerViewController: UIViewController {
         inputButton.backgroundColor = UIColor(red: 87/255, green: 210/255, blue: 200/255, alpha: 1)
         inputButton.addTarget(self, action: #selector(didClickInputButton), for: .touchUpInside)
         return inputButton
+    }()
+    
+    fileprivate lazy var openButton: UIButton = {
+        let width = 200.0
+        let height = 50.0
+        let openButton = UIButton(frame: CGRect(x: (Double(UIScreen.main.bounds.width) - width) * 0.5, y: Double(self.tipLabel.bounds.maxY) + 20.0, width: width, height: height))
+        openButton.isHidden = true
+        openButton.setTitle("立即启用", for: .normal)
+        openButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0)
+        openButton.layer.cornerRadius = 10.0
+        openButton.layer.masksToBounds = true
+        openButton.backgroundColor = UIColor(red: 87/255, green: 210/255, blue: 200/255, alpha: 1)
+        openButton.addTarget(self, action: #selector(didClickOpenButton), for: .touchUpInside)
+        return openButton
     }()
   
   var config: Configuration = Configuration.with {
@@ -89,8 +104,10 @@ class BarcodeScannerViewController: UIViewController {
     setupScanRect(view.bounds)
     view.addSubview(tipLabel)
     view.addSubview(inputButton)
+    view.addSubview(openButton)
     let rect = scanRect!.scanLineRect
     tipLabel.frame = CGRect(x: rect.origin.x, y: rect.origin.y + rect.size.width * 0.5 + 10, width: rect.size.width, height: 40.0)
+    openButton.frame = CGRect(x: openButton.frame.minX, y: rect.origin.y - openButton.frame.height * 0.5, width: openButton.frame.width, height: openButton.frame.height)
     let restrictedBarcodeTypes = mapRestrictedBarcodeTypes()
     if restrictedBarcodeTypes.isEmpty {
       scanner = MTBBarcodeScanner(previewView: previewView)
@@ -132,13 +149,17 @@ class BarcodeScannerViewController: UIViewController {
     }
     
     scanRect?.startAnimating()
-    MTBBarcodeScanner.requestCameraPermission(success: { success in
+    MTBBarcodeScanner.requestCameraPermission(success: { [weak self] success in
       if success {
-        self.startScan()
+        self?.startScan()
+        self?.openButton.isHidden = true
+        self?.tipLabel.text = "请扫描设备上的二维码"
       } else {
-        #if !targetEnvironment(simulator)
-        self.errorResult(errorCode: "PERMISSION_NOT_GRANTED")
-        #endif
+//        #if !targetEnvironment(simulator)
+//        self.errorResult(errorCode: "PERMISSION_NOT_GRANTED")
+//        #endif
+        self?.tipLabel.text = "相机权限已被禁用，无法使用二维码的扫描功能，点击\"立即启用\"打开它"
+        self?.openButton.isHidden = false
       }
     })
   }
@@ -220,6 +241,14 @@ class BarcodeScannerViewController: UIViewController {
           $0.type = .cancelled
           $0.format = .unknown
         });
+    }
+    
+    @objc private func didClickOpenButton() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            if (UIApplication.shared.canOpenURL(url)) {
+                UIApplication.shared.openURL(url)
+            }
+        }
     }
   
   private func updateToggleFlashButton() {
