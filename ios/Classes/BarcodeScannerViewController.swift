@@ -18,7 +18,7 @@ class BarcodeScannerViewController: UIViewController {
         tipLabel.font = UIFont.systemFont(ofSize: 14.0)
         tipLabel.textColor = UIColor.white
         tipLabel.textAlignment = .center
-        tipLabel.text = "请扫描设备上的二维码"
+        tipLabel.text = config.strings["hint"]
         tipLabel.numberOfLines = 0
         tipLabel.adjustsFontSizeToFitWidth = true
         return tipLabel
@@ -28,7 +28,7 @@ class BarcodeScannerViewController: UIViewController {
         let width = 200.0
         let height = 50.0
         let inputButton = UIButton(frame: CGRect(x: (Double(UIScreen.main.bounds.width) - width) * 0.5, y: Double(UIScreen.main.bounds.height) - height - 40.0, width: width, height: height))
-        inputButton.setTitle("输入设备号", for: .normal)
+        inputButton.setTitle(config.strings["btnLabel"], for: .normal)
         inputButton.titleLabel?.font = UIFont.systemFont(ofSize: 18.0)
         inputButton.layer.cornerRadius = 10.0
         inputButton.layer.masksToBounds = true
@@ -56,6 +56,8 @@ class BarcodeScannerViewController: UIViewController {
       "cancel" : "Cancel",
       "flash_on" : "Flash on",
       "flash_off" : "Flash off",
+      "btnLabel": "输入设备号",
+      "hint": "请扫描设备上的二维码"
     ]
     $0.useCamera = -1 // Default camera
     $0.autoEnableFlash = false
@@ -153,7 +155,7 @@ class BarcodeScannerViewController: UIViewController {
       if success {
         self?.startScan()
         self?.openButton.isHidden = true
-        self?.tipLabel.text = "请扫描设备上的二维码"
+        self?.tipLabel.text = self?.config.strings["hint"]
       } else {
 //        #if !targetEnvironment(simulator)
 //        self.errorResult(errorCode: "PERMISSION_NOT_GRANTED")

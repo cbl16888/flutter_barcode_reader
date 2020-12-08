@@ -9,6 +9,8 @@ class ScanOptions {
   /// - cancel : The text of the cancel button (iOS only)
   //  - flash_on : The text of the flash on button
   //  - flash_off : The Text of the flash off button
+  //  - btnLabel: 输入设备号,
+  //  - hint: 请扫描设备上的二维码
   final Map<String, String> strings;
 
   /// Restrict the supported barcode formats
@@ -33,6 +35,8 @@ class ScanOptions {
       "cancel": "Cancel",
       "flash_on": "Flash on",
       "flash_off": "Flash off",
+      "btnLabel": "输入设备号",
+      "hint": "请扫描设备上的二维码"
     },
   })  : assert(restrictFormat != null),
         assert(useCamera != null),
