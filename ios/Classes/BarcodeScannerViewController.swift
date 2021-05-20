@@ -270,7 +270,7 @@ class BarcodeScannerViewController: UIViewController {
     
     @objc private func cancel() {
         self.scanResult(ScanResult.with {
-            $0.type = .error
+            $0.type = .cancelled
             $0.format = .unknown
         })
     }
@@ -281,7 +281,8 @@ class BarcodeScannerViewController: UIViewController {
     
     @objc private func didClickInputButton() {
         scanResult( ScanResult.with {
-            $0.type = .cancelled
+            $0.type = .barcode
+            $0.rawContent = ""
             $0.format = .unknown
         });
     }

@@ -103,30 +103,22 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         contentFrame.addView(scannerView)
     }
 
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == TOGGLE_FLASH) {
-            scannerView?.toggleFlash()
-            this.invalidateOptionsMenu()
-            return true
-        }
-        if (item.itemId == CANCEL) {
-            setResult(RESULT_CANCELED)
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     fun manual(view: View?) {
-//        MainActivity.scanCallBack("")
-//        val intent = Intent()
-//        intent.putExtra(com.kkkangfu.app.ScalingScannerActivity.SCAN_RESULT, "")
-//        setResult(RESULT_OK, intent)
+        val intent = Intent()
+        val builder = Protos.ScanResult.newBuilder()
+        builder.let {
+            it.format = Protos.BarcodeFormat.unknown
+            it.rawContent = ""
+            it.type = Protos.ResultType.Barcode
+        }
+        val res = builder.build()
+        intent.putExtra(EXTRA_RESULT, res.toByteArray())
+        setResult(RESULT_OK, intent)
         finish()
     }
 
     fun close(view: View?) {
+        setResult(RESULT_CANCELED)
         finish()
     }
 
