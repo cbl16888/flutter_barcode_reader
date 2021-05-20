@@ -17,7 +17,7 @@ A new flutter plugin project.
   s.dependency 'Flutter'
   s.dependency 'MTBBarcodeScanner'
   s.dependency 'SwiftProtobuf'
-  s.platform = :ios, '8.0'
+  s.platform = :ios, '9.0'
   s.resources = ['Assets/*']
 
   # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.

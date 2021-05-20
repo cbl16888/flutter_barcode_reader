@@ -250,6 +250,9 @@ class _MyAppState extends State<_MyApp> {
           "cancel": _cancelController.text,
           "flash_on": _flashOnController.text,
           "flash_off": _flashOffController.text,
+          "btnLabel": "输入设备号",
+          "hint": "请扫描设备上的二维码",
+          "btnColor": "#FF69B4FF"
         },
         restrictFormat: selectedFormats,
         useCamera: _selectedCamera,

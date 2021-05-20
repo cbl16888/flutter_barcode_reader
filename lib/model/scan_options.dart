@@ -11,6 +11,7 @@ class ScanOptions {
   //  - flash_off : The Text of the flash off button
   //  - btnLabel: 输入设备号,
   //  - hint: 请扫描设备上的二维码
+  //  - btnColor: 按钮背景颜色
   final Map<String, String> strings;
 
   /// Restrict the supported barcode formats
@@ -36,7 +37,8 @@ class ScanOptions {
       "flash_on": "Flash on",
       "flash_off": "Flash off",
       "btnLabel": "输入设备号",
-      "hint": "请扫描设备上的二维码"
+      "hint": "请扫描设备上的二维码",
+      "btnColor": "#57D2C8FF"
     },
   })  : assert(restrictFormat != null),
         assert(useCamera != null),

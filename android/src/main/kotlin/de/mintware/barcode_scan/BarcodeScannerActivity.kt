@@ -1,10 +1,15 @@
 package de.mintware.barcode_scan
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.util.DisplayMetrics
+import android.view.*
+import android.widget.Button
+import android.widget.FrameLayout
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
@@ -19,6 +24,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     private var scannerView: ZXingScannerView? = null
 
     companion object {
+        var windowsWidth = 0
+        var hint = ""
         const val TOGGLE_FLASH = 200
         const val CANCEL = 300
         const val EXTRA_CONFIG = "config"
@@ -44,22 +51,48 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     // region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setTranslucentStatus(this)
         config = Protos.Configuration.parseFrom(intent.extras!!.getByteArray(EXTRA_CONFIG))
+        hint = config.stringsMap["hint"].toString()
+    }
+
+    private fun setTranslucentStatus(activity: Activity) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        val window = activity.window
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+//            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+//            window.statusBarColor = Color.TRANSPARENT
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+//        }
     }
 
     private fun setupScannerView() {
         if (scannerView != null) {
             return
         }
-
+        setContentView(R.layout.barcode_scanner_activity)
+        val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        windowsWidth = wm.defaultDisplay.width
+        val btnLabel = config.stringsMap["btnLabel"]
+        val btn = findViewById<Button>(R.id.btn)
+        val layoutParams = btn.layoutParams as FrameLayout.LayoutParams
+        val btnWidth = layoutParams.width
+        layoutParams.leftMargin = (windowsWidth - btnWidth) / 2
+        btn.text = btnLabel
+        val drawable: GradientDrawable = btn.background as GradientDrawable
+        drawable.setColor(Color.parseColor(config.stringsMap["btnColor"]))
+        val dm = DisplayMetrics() //定义DisplayMetrics 类提供了一种关于显示的通用信息，如显示大小，分辨率和字体。
+        windowManager.defaultDisplay.getMetrics(dm) //将当前窗口的一些信息放在DisplayMetrics类中
+        val contentFrame = findViewById<View>(R.id.content_frame) as ViewGroup
         scannerView = ZXingAutofocusScannerView(this).apply {
             setAutoFocus(config.android.useAutoFocus)
             val restrictedFormats = mapRestrictedBarcodeTypes()
             if (restrictedFormats.isNotEmpty()) {
                 setFormats(restrictedFormats)
             }
-
             // this parameter will make your HUAWEI phone works great!
             setAspectTolerance(config.android.aspectTolerance.toFloat())
             if (config.autoEnableFlash) {
@@ -67,24 +100,9 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
                 invalidateOptionsMenu()
             }
         }
-
-        setContentView(scannerView)
+        contentFrame.addView(scannerView)
     }
 
-    // region AppBar menu
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        var buttonText = config.stringsMap["flash_on"]
-        if (scannerView?.flash == true) {
-            buttonText = config.stringsMap["flash_off"]
-        }
-        val flashButton = menu.add(0, TOGGLE_FLASH, 0, buttonText)
-        flashButton.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-        val cancelButton = menu.add(0, CANCEL, 0, config.stringsMap["cancel"])
-        cancelButton.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-
-        return super.onCreateOptionsMenu(menu)
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == TOGGLE_FLASH) {
@@ -98,6 +116,18 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun manual(view: View?) {
+//        MainActivity.scanCallBack("")
+//        val intent = Intent()
+//        intent.putExtra(com.kkkangfu.app.ScalingScannerActivity.SCAN_RESULT, "")
+//        setResult(RESULT_OK, intent)
+        finish()
+    }
+
+    fun close(view: View?) {
+        finish()
     }
 
     override fun onPause() {

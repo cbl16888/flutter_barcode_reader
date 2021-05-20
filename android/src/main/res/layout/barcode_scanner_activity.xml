@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="top|left"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@mipmap/back_icon"
+        android:onClick="close"
+        android:textSize="25sp" />
+    <Button android:layout_marginLeft="50dp" android:id="@+id/btn" android:layout_gravity="bottom" android:layout_marginBottom="20dp"
+        android:layout_width="250dp"
+        android:layout_height="50dp" android:textColor="#fff" android:onClick="manual" android:background="@drawable/shape" android:textSize="20dp" android:text="输入设备号"/>
+</FrameLayout>
